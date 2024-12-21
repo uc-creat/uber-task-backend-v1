@@ -4,13 +4,15 @@ from flask import Flask
 from flask_smorest import Api
 
 from db import db
+from flask_migrate import Migrate
 
 from resources.jira import blp as JiraBluePrint
-
+from dotenv import load_dotenv
 
 
 def create_app(db_url=None):
   app = Flask(__name__)
+  load_dotenv()
 
   app.config["PROPAGATE_EXCEPTIONS"] = True
   app.config["API_TITLE"] = "Stores Rest API"
@@ -22,6 +24,7 @@ def create_app(db_url=None):
   app.config["SQLALCHEMY_DATABASE_URI"] = db_url or os.getenv("DATABASE_URL","sqlite:///data.db")
   app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
   db.init_app(app)
+  migrate = Migrate(app,db)
 
   api = Api(app)
 
