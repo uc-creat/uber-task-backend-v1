@@ -23,14 +23,15 @@ def create_app(db_url=None):
   app.config["OPENAPI_SWAGGER_UI_URL"] = "https://cdn.jsdelivr.net/npm/swagger-ui-dist/"
   app.config["SQLALCHEMY_DATABASE_URI"] = db_url or os.getenv("DATABASE_URL","sqlite:///data.db")
   app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
   db.init_app(app)
   migrate = Migrate(app,db)
 
   api = Api(app)
 
 
-  with app.app_context():
-    db.create_all()
+  # with app.app_context():
+  #   db.create_all()
 
   api.register_blueprint(JiraBluePrint)
 
