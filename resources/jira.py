@@ -37,12 +37,14 @@ class JiraResponse(MethodView):
 @blp.route("/jira-check-similarity/<string:id>")
 class CheckSimilarity(MethodView):
   def get(self,id):
-    issue_id = id
-    initial_url = "https://utkarshchauhanutc26.atlassian.net/rest/api/3/issue/"
-    data_url = f"{initial_url}{issue_id}"
     API_KEY = ""
     EMAIL = ""
+    INITIAL_URL = ""
     load_dotenv()
+    issue_id = id
+    initial_url = INITIAL_URL
+    data_url = f"{initial_url}{issue_id}"
+
     auth = HTTPBasicAuth(EMAIL, API_KEY)
 
     headers = {
