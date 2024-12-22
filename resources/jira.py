@@ -4,7 +4,7 @@ from schema import JiraSchema
 from sqlalchemy.exc import SQLAlchemyError
 from requests.auth import HTTPBasicAuth
 import requests
-from flask import jsonify,request
+from dotenv import load_dotenv
 
 from db import db
 from models import JiraModel
@@ -40,7 +40,10 @@ class CheckSimilarity(MethodView):
     issue_id = id
     initial_url = "https://utkarshchauhanutc26.atlassian.net/rest/api/3/issue/"
     data_url = f"{initial_url}{issue_id}"
-    auth = HTTPBasicAuth("utkarshchauhanutc26@gmail.com", "ATATT3xFfGF0YyqYQzktjuZ54CN8e6_L6UnbNc73Rq2ZDrjS2Heqbr5Dm0fpRTARRyOI7fn57RN8a87LCjCWldDScxQ7IluEe-3YOC3ymMNRn6caSy-sgwWf7wk7lXqFgv75fzP04Rxg3k2t9YPngUlCdhIgco0k6uwQqFvW-MpIEFNgPPpf6-E=2A73987F")
+    API_KEY = ""
+    EMAIL = ""
+    load_dotenv()
+    auth = HTTPBasicAuth(EMAIL, API_KEY)
 
     headers = {
       "Accept": "application/json"
