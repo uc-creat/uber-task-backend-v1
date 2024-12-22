@@ -2,6 +2,9 @@ from flask_smorest import abort, Blueprint
 from flask.views import MethodView
 from schema import JiraSchema
 from sqlalchemy.exc import SQLAlchemyError
+from requests.auth import HTTPBasicAuth
+import requests
+from flask import jsonify,request
 
 from db import db
 from models import JiraModel
@@ -31,15 +34,29 @@ class JiraResponse(MethodView):
     return jira
 
 
-@blp.route("/jira-check-similarity")
+@blp.route("/jira-check-similarity/<string:id>")
 class CheckSimilarity(MethodView):
-  @blp.arguments(JiraSchema)
-  def get(self,jira_data):
-    jira = JiraModel(**jira_data)
+  def get(self,id):
+    issue_id = id
+    initial_url = "https://utkarshchauhanutc26.atlassian.net/rest/api/3/issue/"
+    data_url = f"{initial_url}{issue_id}"
+    auth = HTTPBasicAuth("utkarshchauhanutc26@gmail.com", "ATATT3xFfGF0YyqYQzktjuZ54CN8e6_L6UnbNc73Rq2ZDrjS2Heqbr5Dm0fpRTARRyOI7fn57RN8a87LCjCWldDScxQ7IluEe-3YOC3ymMNRn6caSy-sgwWf7wk7lXqFgv75fzP04Rxg3k2t9YPngUlCdhIgco0k6uwQqFvW-MpIEFNgPPpf6-E=2A73987F")
+
+    headers = {
+      "Accept": "application/json"
+    }
+
+    response = requests.request(
+      "GET",
+      data_url,
+      headers=headers,
+      auth=auth
+    )
+    des = response.json()["fields"]["description"]["content"][0]["content"][0]["text"]
     results = []
     nlp = spacy.load("en_core_web_lg")
 
-    user_des = nlp(str(jira.summary))
+    user_des = nlp(str(des))
 
     for i in JiraModel.query.all():
       currentJira = i
@@ -51,6 +68,7 @@ class CheckSimilarity(MethodView):
 
 
 
+
 @blp.route("/jira/<string:id>")
 class DeleteJira(MethodView):
   def delete(self,id):
@@ -58,10 +76,4 @@ class DeleteJira(MethodView):
     db.session.delete(jira)
     db.session.commit()
     return {"message": "Jira deleted"}, 200
-
-
-
-
-
-
 
