@@ -5,6 +5,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from requests.auth import HTTPBasicAuth
 import requests
 from dotenv import load_dotenv
+import os
 
 from db import db
 from models import JiraModel
@@ -37,15 +38,12 @@ class JiraResponse(MethodView):
 @blp.route("/jira-check-similarity/<string:id>")
 class CheckSimilarity(MethodView):
   def get(self,id):
-    API_KEY = ""
-    EMAIL = ""
-    INITIAL_URL = ""
     load_dotenv()
     issue_id = id
-    initial_url = INITIAL_URL
+    initial_url = os.getenv("INITIAL_URL")
     data_url = f"{initial_url}{issue_id}"
 
-    auth = HTTPBasicAuth(EMAIL, API_KEY)
+    auth = HTTPBasicAuth(os.getenv("EMAIL"), os.getenv("API_KEY"))
 
     headers = {
       "Accept": "application/json"
