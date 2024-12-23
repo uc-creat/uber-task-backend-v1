@@ -1,7 +1,7 @@
 from marshmallow import Schema,fields
 
 class JiraSchema(Schema):
-  id = fields.Int(dump_only=True)
+  id = fields.Int(required=True)
   project_id = fields.Int(required=True)
   issue_key = fields.Str(required=True)
   issue_id = fields.Int(required=True)

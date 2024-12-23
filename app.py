@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 
 def create_app(db_url=None):
   app = Flask(__name__)
-  CORS(app)
+  CORS(app,resources="http://127.0.0.1:5000/")
   load_dotenv()
 
   app.config["PROPAGATE_EXCEPTIONS"] = True

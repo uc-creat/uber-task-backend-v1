@@ -1,4 +1,4 @@
-docker run -dp 5005:5000 -w /app -v "$(pwd):/app" uber-project-v1
+docker run -dp 5005:5000 -w /app -v "$(pwd):/app" utkarsh26/uber-project-v1:2.0
 docker build -t uber-project-v1 .
 python -m flask run
 http://127.0.0.1:5000/swagger-ui

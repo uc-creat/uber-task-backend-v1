@@ -96,7 +96,8 @@ class SimilarityMethod(MethodView):
       text1 = currentJira.summary
       embeddings = model.encode([text1, text2], convert_to_tensor=True)
       similarity = util.cos_sim(embeddings[0], embeddings[1])
-      results.append({"Issue Key":currentJira.issue_key,"Similarity score":str(round(similarity.item()*100,2))+"%"})
+      if round(similarity.item()*100,2)>65:
+        results.append({"Issue Key":currentJira.issue_key,"Similarity score":str(round(similarity.item()*100,2))+"%"})
     return ({"results":results,"data":data})
 
 
