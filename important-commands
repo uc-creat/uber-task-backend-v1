@@ -3,3 +3,4 @@ docker build -t uber-project-v1 .
 python -m flask run
 http://127.0.0.1:5000/swagger-ui
 flask db upgrade - will upgrade to the new version of the db
+# or os.getenv("INITIAL_URL")

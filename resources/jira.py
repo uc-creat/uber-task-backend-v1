@@ -7,6 +7,9 @@ import requests
 from dotenv import load_dotenv
 import os
 
+from sentence_transformers import SentenceTransformer, util
+model = SentenceTransformer('all-MiniLM-L6-v2')  # Lightweight model for text embeddings
+
 from db import db
 from models import JiraModel
 
@@ -35,13 +38,22 @@ class JiraResponse(MethodView):
     return jira
 
 
-@blp.route("/jira-check-similarity/<string:id>")
-class CheckSimilarity(MethodView):
+@blp.route("/jira/<string:id>")
+class DeleteJira(MethodView):
+  def delete(self,id):
+    jira = JiraModel.query.get_or_404(id)
+    db.session.delete(jira)
+    db.session.commit()
+    return {"message": "Jira deleted"}, 200
+
+
+@blp.route('/jira/similarity/<string:id>')
+class SimilarityMethod(MethodView):
   def get(self,id):
     load_dotenv()
-    issue_id = id
+    id = id
     initial_url = os.getenv("INITIAL_URL")
-    data_url = f"{initial_url}{issue_id}"
+    data_url = f"{initial_url}{id}"
 
     auth = HTTPBasicAuth(os.getenv("EMAIL"), os.getenv("API_KEY"))
 
@@ -55,28 +67,39 @@ class CheckSimilarity(MethodView):
       headers=headers,
       auth=auth
     )
+    project_id = response.json()['fields']["customfield_10037"]
+    issue_key = response.json()['fields']["customfield_10038"]
+    issue_id = response.json()['fields']["customfield_10039"]
+    issue_type = response.json()['fields']["customfield_10040"]
+    summary = response.json()["fields"]["description"]["content"][0]["content"][0]["text"]
+    priority = response.json()['fields']["customfield_10042"]
+    status = response.json()['fields']["customfield_10041"]
+    resolution = response.json()['fields']["customfield_10043"]
     des = response.json()["fields"]["description"]["content"][0]["content"][0]["text"]
+
+    data = {
+      "project_id":project_id,
+      "issue_key":issue_key,
+      "issue_id":issue_id,
+      "issue_type":issue_type,
+      "summary":summary,
+      "priority":priority,
+      "status":status,
+      "resolution":resolution,
+      "description":summary
+    }
+
     results = []
-    nlp = spacy.load("en_core_web_lg")
-
-    user_des = nlp(str(des))
-
+    text2 = des
     for i in JiraModel.query.all():
       currentJira = i
-      db_des = nlp(currentJira.summary)
-      similarity = user_des.similarity(db_des)
-      results.append({"jira id":currentJira.issue_id,"similarity":similarity})
-
-    return results
-
-
+      text1 = currentJira.summary
+      embeddings = model.encode([text1, text2], convert_to_tensor=True)
+      similarity = util.cos_sim(embeddings[0], embeddings[1])
+      results.append({"Issue Key":currentJira.issue_key,"Similarity score":str(round(similarity.item()*100,2))+"%"})
+    return ({"results":results,"data":data})
 
 
-@blp.route("/jira/<string:id>")
-class DeleteJira(MethodView):
-  def delete(self,id):
-    jira = JiraModel.query.get_or_404(id)
-    db.session.delete(jira)
-    db.session.commit()
-    return {"message": "Jira deleted"}, 200
+
+
 

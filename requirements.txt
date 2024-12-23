@@ -7,3 +7,4 @@ psycopg2
 python-dotenv
 flask-migrate
 flask_cors
+sentence-transformers
