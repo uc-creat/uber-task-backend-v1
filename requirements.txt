@@ -2,7 +2,6 @@ flask
 flask-smorest
 python-dotenv
 flask-sqlalchemy
-spacy
 psycopg2
 python-dotenv
 flask-migrate

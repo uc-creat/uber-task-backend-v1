@@ -13,7 +13,6 @@ model = SentenceTransformer('all-MiniLM-L6-v2')  # Lightweight model for text em
 from db import db
 from models import JiraModel
 
-import spacy
 
 blp = Blueprint("jira", __name__, description = "Operations related to jira")
 
